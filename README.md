@@ -28,6 +28,8 @@ cd Climao
 npm install
 ```
 
+- Preencha as envs no arquivo `.env`
+
 ### Rodando o projeto
 
 - `npm run web` para rodar no navegador
