@@ -1,14 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import { plugOnOrOff } from './stores/plug';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View, Switch } from "react-native";
+
+import { getToken } from "./clients/tuya";
+import { useEffect } from "react";
 
 export default function App() {
-  const onPress = () => plugOnOrOff(true)
-
+  useEffect(() => {
+    (async () => {
+      const token = await getToken();
+      console.log("token: ", token);
+    })();
+  }, []);
   return (
     <View style={styles.container}>
-      <Text>Plug on</Text>
-      <Button title='botao' onPress={onPress}></Button>
+      <Text>Oi</Text>
+
+      <Switch value={false}>Botão</Switch>
+
       <StatusBar style="auto" />
     </View>
   );
@@ -17,8 +25,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
