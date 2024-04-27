@@ -44,7 +44,17 @@ npm install
 
 - expo-crypto -> Não tem o algoritmo Hmac
 
-- Alternativas: cryptoJS ou cryptoES -> `crypto.HmacSHA256(str, secret).toString(crypto.enc.Hex).toUpperCase()` para HMAC e `crypto.SHA256(str).toString(crypto.enc.Hex);` para SHA256
+- Alternativas: cryptoJS -> `crypto.HmacSHA256(str, secret).toString(crypto.enc.Hex).toUpperCase()` para HMAC e `crypto.SHA256(str).toString(crypto.enc.Hex);` para SHA256
 
 - Quando roda no app (arquivo `clients/tuya.ts`), dá problema de CORS Policy
 - No [código do postman](https://developer.tuya.com/en/docs/iot/check-postman-sign?id=Kavfn3820sxg4), dá certo, mesmo com os mesmos headers
+
+### Resolvendo o problema de cors:
+
+Precisa inicializar o chrome com os parâmetros `--disable-web-security --user-data-dir=~/chromeTemp`.
+
+```shell
+[PATH PARA O CHROME]/chrome.exe --disable-web-security --user-data-dir=~/chromeTemp
+```
+
+Ver [este vídeo](https://www.youtube.com/watch?v=MkiDyyBDuSE) para saber como pegar o path do chrome e como executar o comando de maneira mais fácil.
