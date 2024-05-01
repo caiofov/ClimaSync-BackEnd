@@ -1,18 +1,31 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Switch } from "react-native";
 
-import { getToken } from "./clients/tuya";
-import { useEffect } from "react";
+import { getDeviceInfo, getToken } from "./clients/tuya";
+import { useEffect, useState } from "react";
+import CONFIG from "./config";
 
 export default function App() {
+  const [token, setToken] = useState<string | undefined>();
+  const [info, setInfo] = useState();
   useEffect(() => {
     (async () => {
-      const token = await getToken();
-      console.log("token: ", token);
+      const t = await getToken().then((r) => {
+        setToken(r.result.access_token);
+        return r.result.access_token;
+      });
+
+      const info = await getDeviceInfo(CONFIG.tuyaDeviceID, t).then((r) => {
+        setInfo(r);
+        return r;
+      });
     })();
   }, []);
+
   return (
     <View style={styles.container}>
+      <Text>{token}</Text>
+      <Text>{JSON.stringify(info)}</Text>
       <Text>Oi</Text>
 
       <Switch value={false}>Botão</Switch>

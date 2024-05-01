@@ -1,11 +1,16 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { TuyaContext } from "@tuya/tuya-connector-nodejs";
+import { TuyaContext, TuyaResponse } from "@tuya/tuya-connector-nodejs";
 import CONFIG from "../config";
 
+type ResultType = {
+  code: string;
+  value: string;
+};
+type PlugStatus = TuyaResponse<ResultType>;
 interface PlugInfo {
   context: TuyaContext;
   device: string;
-  status: any;
+  status: PlugStatus;
 }
 
 const makeTuyaRequest = async (on: boolean, plug: PlugInfo) => {
@@ -28,26 +33,45 @@ const initialState: PlugInfo = {
     secretKey: CONFIG.tuyaAccessSecret,
   }),
   device: CONFIG.tuyaDeviceID, //TODO: mais tomadas
-  status: {},
+  status: { result: [] as ResultType[] },
 };
 
 const plugReducer = createSlice({
   name: "plug",
   initialState,
   reducers: {
-    updateStatus: (state, status: any) => {
-      state.status = status;
+    updateStatus: (state, action: { payload: PlugStatus }) => {
+      state.status = action.payload;
     },
   },
 });
 
-const plugStore = configureStore({
+export const plugStore = configureStore({
   reducer: { plug: plugReducer.reducer },
 });
 const plugActions = plugReducer.actions;
 
+export const updateStatus = async () => {
+  // const plug = plugStore.getState().plug;
+  // plugStore.dispatch(
+  //   plugActions.updateStatus(
+  //     await plug.context.deviceStatus.status({ device_id: plug.device })
+  //   )
+  // );
+  const context = new TuyaContext({
+    baseUrl: "https://openapi.tuyaus.com",
+    accessKey: CONFIG.tuyaAccessID,
+    secretKey: CONFIG.tuyaAccessSecret,
+  });
+  return await context.deviceStatus.status({ device_id: CONFIG.tuyaDeviceID });
+};
 export const plugOnOrOff = async (on: boolean) => {
-  const status = await makeTuyaRequest(on, plugStore.getState().plug);
-  console.log(status);
-  plugStore.dispatch(plugActions.updateStatus(status));
+  const plug = plugStore.getState().plug;
+  await makeTuyaRequest(on, plug);
+
+  updateStatus();
+};
+
+export const isOn = () => {
+  plugStore.getState().plug.status.result;
 };
