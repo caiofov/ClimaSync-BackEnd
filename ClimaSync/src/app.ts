@@ -1,8 +1,10 @@
 import CONFIG from "./config";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
 import { getWeather } from "./weather";
+import * as express from "express";
+
 // Este arquivo deve conter todos as rotas da aplicação. É ele que é chamado quando esse projeto é rodado.
-const express = require("express");
+
 const app = express();
 
 app.listen(CONFIG.PORT, () => {
