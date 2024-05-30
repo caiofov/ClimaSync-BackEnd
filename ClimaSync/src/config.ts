@@ -9,6 +9,7 @@ const CONFIG = {
   TUYA_CLIENT_ID: process.env.TUYA_ACCESS_ID,
   TUYA_CLIENT_SECRET: process.env.TUYA_ACCESS_SECRET,
   TUYA_DEVICE_ID: process.env.TUYA_DEVICE_ID,
+  WEATHER_KEY: process.env.WEATHER_KEY,
 };
 
 export default CONFIG;
