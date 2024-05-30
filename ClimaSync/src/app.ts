@@ -1,5 +1,6 @@
 import CONFIG from "./config";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
+import { getWeather } from "./weather";
 // Este arquivo deve conter todos as rotas da aplicação. É ele que é chamado quando esse projeto é rodado.
 const express = require("express");
 const app = express();
@@ -28,4 +29,11 @@ app.post("/tuya/switch/:value", async (req, res) => {
       res.status(500).json("[Tuya] - Error on executing command");
     else res.status(200).json(commands);
   }
+});
+
+app.get("/weather/:lat/:lon", async (req, res) => {
+  const lat = Number(req.params.lat);
+  const lon = Number(req.params.lon);
+  const response = await getWeather(lat, lon);
+  res.status(200).json(response);
 });
