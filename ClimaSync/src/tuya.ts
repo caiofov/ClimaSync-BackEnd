@@ -16,7 +16,6 @@ export const sendTuyaCommand = async (on: boolean) => {
       commands: [{ code: "switch_1", value: on }],
     },
   });
-  if (!commands.success) throw new Error();
   return commands;
 };
 

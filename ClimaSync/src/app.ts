@@ -18,11 +18,14 @@ app.get("/tuya/status", async (req, res) => {
 app.post("/tuya/switch/:value", async (req, res) => {
   if (!["true", "false"].includes(req.params.value)) {
     res
-      .status(403)
-      .json(`Invalid value '${req.params.value}' - required 'true' or 'false'`);
+      .status(422)
+      .json(`Invalid value '${req.params.value}' - allowed 'true' or 'false'`);
   } else {
     const value: boolean = JSON.parse(req.params.value);
     const commands = await sendTuyaCommand(value);
-    res.status(200).json(commands);
+
+    if (!commands.success)
+      res.status(500).json("[Tuya] - Error on executing command");
+    else res.status(200).json(commands);
   }
 });
