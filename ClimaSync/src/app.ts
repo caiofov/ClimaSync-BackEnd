@@ -1,5 +1,6 @@
 import CONFIG from "./config";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
+import { logRequest } from "./utils";
 import { getWeather } from "./weather";
 import * as express from "express";
 
@@ -14,11 +15,13 @@ app.listen(CONFIG.PORT, () => {
 // TUYA
 
 app.get("/tuya/status", async (req, res) => {
+  logRequest(req);
   const status = await getTuyaStatus();
   res.status(200).json(status);
 });
 
 app.post("/tuya/switch/:value", async (req, res) => {
+  logRequest(req);
   if (!["true", "false"].includes(req.params.value)) {
     res
       .status(422)
@@ -34,8 +37,11 @@ app.post("/tuya/switch/:value", async (req, res) => {
 });
 
 app.get("/weather/:lat/:lon", async (req, res) => {
+  logRequest(req);
+
   const lat = Number(req.params.lat);
   const lon = Number(req.params.lon);
+
   const response = await getWeather(lat, lon);
   res.status(200).json(response);
 });
