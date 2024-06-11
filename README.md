@@ -4,6 +4,16 @@ Aplicação ubíqua para ligar tomadas inteligentes com base na temperatura loca
 
 > Trabalho final da disciplina de Computação Móvel e Ubíquoa
 
+**Como rodar**
+
+```shell
+cd ClimaSync
+npm install
+npm start
+```
+
+- Precisa configurar as envs
+
 ### Referências
 
 (https://take6shin-tech-diary.com/tuyapi-smartplug/)[https://take6shin-tech-diary.com/tuyapi-smartplug/]
