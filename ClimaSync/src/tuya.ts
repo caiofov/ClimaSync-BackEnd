@@ -1,5 +1,7 @@
-import { TuyaContext } from "@tuya/tuya-connector-nodejs";
+import { TuyaContext, TuyaResponse } from "@tuya/tuya-connector-nodejs";
 import CONFIG from "./config";
+import { ConvertedTuyaStatus, TuyaStatusResponse } from "./models/tuya";
+import { TUYA_COMMANDS } from "./enums/tuya";
 
 const _getTuyaContext = () =>
   new TuyaContext({
@@ -20,9 +22,15 @@ export const sendTuyaCommand = async (on: boolean) => {
 };
 
 export const getTuyaStatus = async () => {
-  const status = await _getTuyaContext().deviceStatus.status({
-    device_id: CONFIG.TUYA_DEVICE_ID,
-  });
+  const status: TuyaResponse<TuyaStatusResponse> =
+    await _getTuyaContext().request({
+      method: "GET",
+      path: `/v1.0/devices/${CONFIG.TUYA_DEVICE_ID}`,
+    });
 
-  return status;
+  return {
+    isOnline: status.result.online,
+    isTurnedOn: status.result.status.find((i) => i.code == TUYA_COMMANDS.SWITCH)
+      .value as boolean,
+  } as ConvertedTuyaStatus;
 };

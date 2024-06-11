@@ -12,6 +12,10 @@ app.listen(CONFIG.PORT, () => {
   console.log(`Server is running on port ${CONFIG.PORT}`);
 });
 
+app.use(function (error, req, res, next) {
+  logRequest(req);
+});
+
 // TUYA
 
 app.get("/tuya/status", async (req, res) => {
@@ -35,6 +39,8 @@ app.post("/tuya/switch/:value", async (req, res) => {
     else res.status(200).json(commands);
   }
 });
+
+// CLIMA
 
 app.get("/weather/:lat/:lon", async (req, res) => {
   logRequest(req);
