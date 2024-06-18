@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx ts-node src/app.ts",
     "start": "node build/app.js",
-    "build": "tsc --outDir build"
+    "build": "npm install && tsc --outDir build"
   },
   "dependencies": {
     "@tuya/tuya-connector-nodejs": "^2.1.2",
