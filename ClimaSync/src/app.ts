@@ -18,21 +18,23 @@ app.use(function (error, req, res, next) {
 
 // TUYA
 
-app.get("/tuya/status", async (req, res) => {
+app.get("/tuya/:deviceId/status", async (req, res) => {
   logRequest(req);
-  const status = await getTuyaStatus();
+  const deviceID = req.params.deviceId;
+  const status = await getTuyaStatus(deviceID);
   res.status(200).json(status);
 });
 
-app.post("/tuya/switch/:value", async (req, res) => {
+app.post("/tuya/:deviceId/switch/:value", async (req, res) => {
   logRequest(req);
+  const deviceID = req.params.deviceId;
   if (!["true", "false"].includes(req.params.value)) {
     res
       .status(422)
       .json(`Invalid value '${req.params.value}' - allowed 'true' or 'false'`);
   } else {
     const value: boolean = JSON.parse(req.params.value);
-    const commands = await sendTuyaCommand(value);
+    const commands = await sendTuyaCommand(value, deviceID);
 
     if (!commands.success)
       res.status(500).json("[Tuya] - Error on executing command");
