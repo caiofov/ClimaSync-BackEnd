@@ -10,9 +10,9 @@ const _getTuyaContext = () =>
     secretKey: CONFIG.TUYA_CLIENT_SECRET,
   });
 
-export const sendTuyaCommand = async (on: boolean) => {
+export const sendTuyaCommand = async (on: boolean, deviceID: string) => {
   const commands = await _getTuyaContext().request({
-    path: `/v1.0/iot-03/devices/${CONFIG.TUYA_DEVICE_ID}/commands`,
+    path: `/v1.0/iot-03/devices/${deviceID}/commands`,
     method: "POST",
     body: {
       commands: [{ code: "switch_1", value: on }],
@@ -21,11 +21,11 @@ export const sendTuyaCommand = async (on: boolean) => {
   return commands;
 };
 
-export const getTuyaStatus = async () => {
+export const getTuyaStatus = async (deviceID: string) => {
   const status: TuyaResponse<TuyaStatusResponse> =
     await _getTuyaContext().request({
       method: "GET",
-      path: `/v1.0/devices/${CONFIG.TUYA_DEVICE_ID}`,
+      path: `/v1.0/devices/${deviceID}`,
     });
 
   return {
