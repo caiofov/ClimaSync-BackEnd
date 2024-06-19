@@ -1,4 +1,5 @@
 import CONFIG from "./config";
+import { getUser } from "./dao";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
 import { logRequest } from "./utils";
 import { getWeather } from "./weather";
@@ -52,4 +53,13 @@ app.get("/weather/:lat/:lon", async (req, res) => {
 
   const response = await getWeather(lat, lon);
   res.status(200).json(response);
+});
+
+// USUÁRIOS
+
+app.get("/user/:deviceID", async (req, res) => {
+  logRequest(req);
+  const deviceID = req.params.deviceID;
+  const user = await getUser(deviceID);
+  res.status(200).json(user);
 });
