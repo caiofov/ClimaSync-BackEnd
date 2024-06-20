@@ -31,19 +31,26 @@ const alertUsers = (users: User[], alerts: AlertType[]) => {
 };
 
 export const searchForAlerts = async () => {
-  (await getAllPlaces()).forEach(async (place) => {
-    console.log(`Gerando alertas para a cidade ${place}`);
+  const alertsFound = {};
+  const places = await getAllPlaces();
+
+  for (const place of places) {
+    console.log(`> Gerando alertas para a cidade ${place}`);
 
     const info = await getWeatherByName(place);
 
     const alerts = alertsForInfo(info);
+    alertsFound[place] = alerts;
 
     if (alerts.length) {
       console.log(`\tAlertas encontrados: ${alerts}`);
+
       const users = await getUsersByPlaceAndAlert(place, alerts);
       alertUsers(users, alerts);
     } else {
       console.log("\tNenhum alerta encontrado");
     }
-  });
+  }
+
+  return alertsFound;
 };

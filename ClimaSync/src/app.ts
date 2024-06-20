@@ -24,8 +24,8 @@ const jsonParser = bodyParser.json();
 
 app.post("/cron-job", async (req, res) => {
   logRequest(req);
-  searchForAlerts();
-  res.status(200).json();
+  const result = await searchForAlerts();
+  res.status(200).json(result);
 });
 
 // TUYA
