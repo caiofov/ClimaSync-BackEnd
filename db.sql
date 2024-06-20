@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS public."user"
     alerta_frio boolean,
     alerta_sol boolean,
     alerta_chuva boolean,
+    alerta_hidratacao boolean,
     CONSTRAINT user_pkey PRIMARY KEY (device_id)
 )
 
