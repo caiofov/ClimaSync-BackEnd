@@ -7,6 +7,7 @@ import { getWeather } from "./weather";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Request } from "express";
+import { searchForAlerts } from "./alerts";
 
 type CustomRequest<T> = Request<{}, {}, T>;
 
@@ -20,6 +21,12 @@ app.listen(CONFIG.PORT, () => {
 
 // JSON parser
 const jsonParser = bodyParser.json();
+
+app.post("/cron-job", async (req, res) => {
+  logRequest(req);
+  searchForAlerts();
+  res.status(200).json();
+});
 
 // TUYA
 
