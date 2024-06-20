@@ -1,5 +1,5 @@
 import CONFIG from "./config";
-import { User } from "./models/user";
+import { AlertType, User } from "./models/user";
 import { Pool } from "pg";
 
 const getPool = () =>
@@ -43,4 +43,23 @@ export const getUser = async (deviceID: string) => {
     console.error("Erro ao buscar usuário:", error);
     throw error;
   }
+};
+
+export const getAllPlaces = async () => {
+  return (
+    await getPool().query("SELECT DISTINCT localizacao FROM public.user")
+  ).rows.map((r) => r.localizacao) as string[];
+};
+
+export const getUsersByPlaceAndAlert = async (
+  place: string,
+  alerts: AlertType[]
+) => {
+  const joinedAlerts = alerts.join("OR");
+  return (
+    await getPool().query(
+      `SELECT * FROM public.user WHERE localizacao = $1 AND (${joinedAlerts})`,
+      [place]
+    )
+  ).rows as User[];
 };
