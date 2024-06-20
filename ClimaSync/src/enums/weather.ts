@@ -70,3 +70,25 @@ export type ConditionCodeType =
 
 export type ConditionSlugType =
   (typeof CONDITION_SLUG)[keyof typeof CONDITION_SLUG];
+
+export const TEMP_ALERT = {
+  HOT: 30,
+  COLD: 15,
+  HUMIDITY: 20,
+} as const;
+
+export const WEATHER_ALERT = {
+  RAINY: [
+    CONDITION_CODE.STRONG_STORM,
+    CONDITION_CODE.TROPICAL_STORM,
+    CONDITION_CODE.RAIN,
+    CONDITION_CODE.MIXED_RAIN_AND_HAIL,
+    CONDITION_CODE.MIXED_RAIN_AND_SLEET,
+    CONDITION_CODE.FREEZING_RAIN,
+  ] as number[],
+  SUNNY: [
+    CONDITION_CODE.SUNNY,
+    CONDITION_CODE.MOSTLY_SUNNY,
+    CONDITION_CODE.MOSTLY_SUNNY_WITH_SOME_CLOUDS,
+  ] as number[],
+};
