@@ -1,9 +1,14 @@
 import CONFIG from "./config";
-import { getUser } from "./dao";
+import { createUser, getUser } from "./dao";
+import { User, validateUser } from "./models/user";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
 import { logRequest } from "./utils";
 import { getWeather } from "./weather";
 import * as express from "express";
+import * as bodyParser from "body-parser";
+import { Request } from "express";
+
+type CustomRequest<T> = Request<{}, {}, T>;
 
 // Este arquivo deve conter todos as rotas da aplicação. É ele que é chamado quando esse projeto é rodado.
 
@@ -13,9 +18,8 @@ app.listen(CONFIG.PORT, () => {
   console.log(`Server is running on port ${CONFIG.PORT}`);
 });
 
-app.use(function (error, req, res, next) {
-  logRequest(req);
-});
+// JSON parser
+const jsonParser = bodyParser.json();
 
 // TUYA
 
@@ -62,4 +66,17 @@ app.get("/user/:deviceID", async (req, res) => {
   const deviceID = req.params.deviceID;
   const user = await getUser(deviceID);
   res.status(200).json(user);
+});
+
+app.post("/user", jsonParser, async (req: CustomRequest<User>, res) => {
+  logRequest(req);
+  const user = req.body;
+
+  try {
+    validateUser(user);
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+  await createUser(user);
+  res.status(200).json("Usuário criado com sucesso");
 });

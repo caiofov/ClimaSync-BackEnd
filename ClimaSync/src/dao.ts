@@ -11,8 +11,25 @@ const getPool = () =>
     port: CONFIG.POSTGRES_PORT,
   });
 
-export const createUser = (user: User) => {};
-//INSERT INTO public.user (firebase_token, device_id, localizacao) VALUES ('token', 'teste_device_id','Fortaleza,CE')
+export const createUser = async (user: User) => {
+  try {
+    await getPool().query(
+      "INSERT INTO public.user (firebase_token, device_id, localizacao, alerta_calor, alerta_chuva, alerta_frio, alerta_sol) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [
+        user.firebase_token,
+        user.device_id,
+        user.localizacao,
+        user.alerta_calor,
+        user.alerta_chuva,
+        user.alerta_frio,
+        user.alerta_sol,
+      ]
+    );
+  } catch (error) {
+    console.error("Erro ao criar usuário:", error);
+    throw error;
+  }
+};
 
 export const getUser = async (deviceID: string) => {
   try {
