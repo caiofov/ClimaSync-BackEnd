@@ -58,6 +58,14 @@ export const getAllPlaces = async () => {
   ).rows.map((r) => r.localizacao) as string[];
 };
 
+export const listUsersByPlace = async (place: string) => {
+  return (
+    await getPool().query(`SELECT * FROM public.user WHERE localizacao = $1`, [
+      place,
+    ])
+  ).rows as User[];
+};
+
 // lista os usuários localizados no lugar passado e que tem um dos alertas passados ligados
 export const getUsersByPlaceAndAlert = async (
   place: string,
