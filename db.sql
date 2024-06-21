@@ -21,17 +21,22 @@ CREATE DATABASE climasync
 CREATE TABLE IF NOT EXISTS public."user"
 (
     firebase_token character varying COLLATE pg_catalog."default" NOT NULL,
-    device_id character varying COLLATE pg_catalog."default" NOT NULL,
+    device_id character varying COLLATE pg_catalog."default" NOT NULL DEFAULT "<DEVICE_ID>", -- Substituir pelo device ID
     localizacao character varying COLLATE pg_catalog."default" NOT NULL,
-    alerta_calor boolean,
-    alerta_frio boolean,
-    alerta_sol boolean,
-    alerta_chuva boolean,
-    alerta_hidratacao boolean,
-    CONSTRAINT user_pkey PRIMARY KEY (device_id)
+    titulo_alerta character varying COLLATE pg_catalog."default",
+    corpo_alerta character varying COLLATE pg_catalog."default",
+    tipo_alerta character varying COLLATE pg_catalog."default",
+    timestamp_alerta date,
+    alerta_calor boolean DEFAULT true,
+    alerta_frio boolean DEFAULT true,
+    alerta_sol boolean DEFAULT true,
+    alerta_chuva boolean DEFAULT true,
+    alerta_hidratacao boolean DEFAULT true,
+    CONSTRAINT user_pkey PRIMARY KEY (firebase_token)
 )
 
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public."user"
-    OWNER to postgres;
+    OWNER to admin; -- prod
+    -- OWNER to postgres; -- local
