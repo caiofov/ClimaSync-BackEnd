@@ -11,6 +11,8 @@ const getPool = () =>
     database: CONFIG.POSTGRES_DB,
     password: CONFIG.POSTGRES_PASSWORD,
     port: CONFIG.POSTGRES_PORT,
+    idleTimeoutMillis: 3000,
+    ssl: true,
   });
 
 // cria um usuário no banco
