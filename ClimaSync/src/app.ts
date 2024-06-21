@@ -1,6 +1,6 @@
 import CONFIG from "./config";
-import { createUser, getUser } from "./dao";
-import { User, validateUser } from "./models/user";
+import { findOrCreateUser } from "./dao";
+import { UserInput, validateUser } from "./models/user";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
 import { logRequest } from "./utils";
 import { getWeather } from "./weather";
@@ -57,6 +57,7 @@ app.post("/tuya/:deviceId/switch/:value", async (req, res) => {
 // CLIMA
 
 app.get("/weather/:lat/:lon", async (req, res) => {
+  //TODO: receber token pra atualizar a localização se for diferente da que tá no banco
   logRequest(req);
 
   const lat = Number(req.params.lat);
@@ -68,14 +69,7 @@ app.get("/weather/:lat/:lon", async (req, res) => {
 
 // USUÁRIOS
 
-app.get("/user/:pushToken", async (req, res) => {
-  logRequest(req);
-  const pushToken = req.params.pushToken;
-  const user = await getUser(pushToken);
-  res.status(200).json(user);
-});
-
-app.post("/user", jsonParser, async (req: CustomRequest<User>, res) => {
+app.post("/user", jsonParser, async (req: CustomRequest<UserInput>, res) => {
   logRequest(req);
   const user = req.body;
 
@@ -84,6 +78,6 @@ app.post("/user", jsonParser, async (req: CustomRequest<User>, res) => {
   } catch (error) {
     res.status(400).json({ error });
   }
-  await createUser(user);
-  res.status(200).json("Usuário criado com sucesso");
+  const userFound = await findOrCreateUser(user);
+  res.status(200).json(userFound);
 });

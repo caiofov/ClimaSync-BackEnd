@@ -1,5 +1,5 @@
 import CONFIG from "./config";
-import { AlertType, User } from "./models/user";
+import { AlertType, User, UserInput } from "./models/user";
 import { Pool } from "pg";
 
 // este arquivo contém as consultas no banco de dados
@@ -16,25 +16,25 @@ const getPool = () =>
   });
 
 // cria um usuário no banco
-export const createUser = async (user: User) => {
-  try {
-    await getPool().query(
-      "INSERT INTO public.user (firebase_token, device_id, localizacao, alerta_calor, alerta_chuva, alerta_frio, alerta_sol) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-      [
-        user.firebase_token,
-        user.device_id,
-        user.localizacao,
-        user.alerta_calor,
-        user.alerta_chuva,
-        user.alerta_frio,
-        user.alerta_sol,
-      ]
-    );
-  } catch (error) {
-    console.error("Erro ao criar usuário:", error);
-    throw error;
-  }
-};
+// export const createUser = async (user: User) => {
+//   try {
+//     await getPool().query(
+//       "INSERT INTO public.user (firebase_token, device_id, localizacao, alerta_calor, alerta_chuva, alerta_frio, alerta_sol) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+//       [
+//         user.firebase_token,
+//         user.device_id,
+//         user.localizacao,
+//         user.alerta_calor,
+//         user.alerta_chuva,
+//         user.alerta_frio,
+//         user.alerta_sol,
+//       ]
+//     );
+//   } catch (error) {
+//     console.error("Erro ao criar usuário:", error);
+//     throw error;
+//   }
+// };
 
 // pega um usuário pela sua PK
 export const getUser = async (token: string) => {
@@ -47,6 +47,32 @@ export const getUser = async (token: string) => {
     else throw "Usuário não existe";
   } catch (error) {
     console.error("Erro ao buscar usuário:", error);
+    throw error;
+  }
+};
+
+export const findOrCreateUser = async (user: UserInput) => {
+  const pool = await getPool();
+  const find = () =>
+    pool.query("SELECT * FROM public.user WHERE firebase_token = $1", [
+      user.firebase_token,
+    ]);
+
+  try {
+    let findResult = await find();
+    if (findResult.rowCount == 0) {
+      console.log("Criando usuário");
+      await getPool().query(
+        "INSERT INTO public.user (firebase_token) VALUES ($1)",
+        [user.firebase_token]
+      );
+      findResult = await find();
+    }
+
+    if (findResult.rowCount > 0) return findResult.rows[0] as User;
+    else throw "Ocorreu um erro";
+  } catch (error) {
+    console.error("Erro ao criar usuário:", error);
     throw error;
   }
 };
