@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS public."user"
 (
     firebase_token character varying COLLATE pg_catalog."default" NOT NULL,
     device_id character varying COLLATE pg_catalog."default" NOT NULL DEFAULT "<DEVICE_ID>", -- Substituir pelo device ID
-    localizacao character varying COLLATE pg_catalog."default" NOT NULL,
+    localizacao character varying COLLATE pg_catalog."default",
     titulo_alerta character varying COLLATE pg_catalog."default",
     corpo_alerta character varying COLLATE pg_catalog."default",
     tipo_alerta character varying COLLATE pg_catalog."default",

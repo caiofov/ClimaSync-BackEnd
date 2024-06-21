@@ -10,7 +10,7 @@ export type AlertType =
 
 export interface User extends UserInput {
   device_id: string;
-  localizacao: string;
+  localizacao?: string;
 
   titulo_alerta?: string;
   corpo_alerta?: string;
