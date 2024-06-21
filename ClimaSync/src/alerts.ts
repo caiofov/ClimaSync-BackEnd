@@ -4,7 +4,10 @@ import { AlertType, User } from "./models/user";
 import { WeatherResponse } from "./models/weather";
 import { getWeatherByName } from "./weather";
 
+// este arquivo contém as funções do cron job para coletar as informações de clima e notificar os usuários
+
 const alertsForInfo = (info: WeatherResponse) => {
+  // identifica quais alertas vão ser ativados com essas informações de clima
   const alerts: AlertType[] = [];
 
   if (info.results.temp >= TEMP_ALERT.HOT) alerts.push("alerta_calor");
@@ -26,12 +29,13 @@ const alertUsers = (users: User[], alerts: AlertType[]) => {
     alerts.forEach((alert) => {
       if (user[alert])
         console.log(`Alert ${alert}, usuário ${user.firebase_token}`);
+      //TODO: notificar o usuário aqui
     });
   });
 };
 
 export const searchForAlerts = async () => {
-  const alertsFound = {};
+  const alertsFound: { [city: string]: string[] } = {};
   const places = await getAllPlaces();
 
   for (const place of places) {

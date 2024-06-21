@@ -3,6 +3,8 @@ import CONFIG from "./config";
 import { ConvertedTuyaStatus, TuyaStatusResponse } from "./models/tuya";
 import { TUYA_COMMANDS } from "./enums/tuya";
 
+// este arquivo contém as requisições para a API da tuya
+
 const _getTuyaContext = () =>
   new TuyaContext({
     baseUrl: "https://openapi.tuyaus.com",

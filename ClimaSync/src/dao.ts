@@ -2,6 +2,8 @@ import CONFIG from "./config";
 import { AlertType, User } from "./models/user";
 import { Pool } from "pg";
 
+// este arquivo contém as consultas no banco de dados
+
 const getPool = () =>
   new Pool({
     user: CONFIG.POSTGRES_USER,
@@ -11,6 +13,7 @@ const getPool = () =>
     port: CONFIG.POSTGRES_PORT,
   });
 
+// cria um usuário no banco
 export const createUser = async (user: User) => {
   try {
     await getPool().query(
@@ -31,6 +34,7 @@ export const createUser = async (user: User) => {
   }
 };
 
+// pega um usuário pela sua PK
 export const getUser = async (deviceID: string) => {
   try {
     const result = await getPool().query(
@@ -45,12 +49,14 @@ export const getUser = async (deviceID: string) => {
   }
 };
 
+// faz uma lista com todos os lugares cadastrados no banco
 export const getAllPlaces = async () => {
   return (
     await getPool().query("SELECT DISTINCT localizacao FROM public.user")
   ).rows.map((r) => r.localizacao) as string[];
 };
 
+// lista os usuários localizados no lugar passado e que tem um dos alertas passados ligados
 export const getUsersByPlaceAndAlert = async (
   place: string,
   alerts: AlertType[]
