@@ -37,11 +37,11 @@ export const createUser = async (user: User) => {
 };
 
 // pega um usuário pela sua PK
-export const getUser = async (deviceID: string) => {
+export const getUser = async (token: string) => {
   try {
     const result = await getPool().query(
-      "SELECT * FROM public.user WHERE device_id = $1",
-      [deviceID]
+      "SELECT * FROM public.user WHERE firebase_token = $1",
+      [token]
     );
     if (result.rowCount > 0) return result.rows[0] as User;
     else throw "Usuário não existe";

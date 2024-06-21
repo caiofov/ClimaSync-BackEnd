@@ -68,10 +68,10 @@ app.get("/weather/:lat/:lon", async (req, res) => {
 
 // USUÁRIOS
 
-app.get("/user/:deviceID", async (req, res) => {
+app.get("/user/:pushToken", async (req, res) => {
   logRequest(req);
-  const deviceID = req.params.deviceID;
-  const user = await getUser(deviceID);
+  const pushToken = req.params.pushToken;
+  const user = await getUser(pushToken);
   res.status(200).json(user);
 });
 
