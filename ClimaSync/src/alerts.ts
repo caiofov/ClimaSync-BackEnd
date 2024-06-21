@@ -1,7 +1,8 @@
-import { getAllPlaces, getUsersByPlaceAndAlert } from "./dao";
+import { getAllPlaces, listUsersByPlace } from "./dao";
 import { TEMP_ALERT, WEATHER_ALERT } from "./enums/weather";
 import { AlertType, User } from "./models/user";
 import { WeatherResponse } from "./models/weather";
+import { sendTuyaCommand } from "./tuya";
 import { getWeatherByName } from "./weather";
 
 // este arquivo contém as funções do cron job para coletar as informações de clima e notificar os usuários
@@ -26,12 +27,15 @@ const alertsForInfo = (info: WeatherResponse) => {
 
 const alertUsers = (users: User[], alerts: AlertType[]) => {
   users.forEach((user) => {
-    alerts.forEach((alert) => {
-      if (user[alert])
-        console.log(`Alert ${alert}, usuário ${user.firebase_token}`);
-      //TODO: notificar o usuário aqui
-    });
+    console.log(`Notificar usuário ${user.firebase_token}`);
+    //TODO: notificar o usuário aqui
+    //TODO: tratar qual alerta é prioritário
   });
+};
+
+const controlDevices = async (users: User[], on: boolean) => {
+  console.log(`\t${on ? "Ligando" : "Desligando"} os dispositivos`);
+  for (const user of users) sendTuyaCommand(on, user.device_id);
 };
 
 export const searchForAlerts = async () => {
@@ -48,8 +52,12 @@ export const searchForAlerts = async () => {
 
     if (alerts.length) {
       console.log(`\tAlertas encontrados: ${alerts}`);
+      const users = await listUsersByPlace(place);
 
-      const users = await getUsersByPlaceAndAlert(place, alerts);
+      //liga ou desliga os dispositivos com base no alerta
+      if (alerts.includes("alerta_calor")) controlDevices(users, true);
+      else if (alerts.includes("alerta_frio")) controlDevices(users, false);
+
       alertUsers(users, alerts);
     } else {
       console.log("\tNenhum alerta encontrado");
