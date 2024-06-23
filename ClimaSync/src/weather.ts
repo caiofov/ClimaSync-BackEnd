@@ -30,7 +30,7 @@ export const getWeather = async (latitude: number, longitude: number) => {
   );
 };
 
-export const transformWeatherResponse = async (info: WeatherResponse) =>
+export const transformWeatherResponse = (info: WeatherResponse) =>
   ({
     temp: info.results.temp,
     city: info.results.city,

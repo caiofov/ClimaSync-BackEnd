@@ -62,14 +62,20 @@ app.post("/tuya/:deviceId/switch/:value", async (req, res) => {
 
 // CLIMA
 
-app.put("/weather", async (req: CustomRequest<LocationInput>, res) => {
-  logRequest(req);
+app.put(
+  "/weather",
+  jsonParser,
+  async (req: CustomRequest<LocationInput>, res) => {
+    logRequest(req);
+    const body = req.body;
 
-  const response = await getWeather(req.body.latitude, req.body.latitude);
-  updateUserLocation(req.body.token, response.results.city_name);
+    const response = await getWeather(body.latitude, body.latitude);
 
-  res.status(200).json(transformWeatherResponse(response));
-});
+    updateUserLocation(body.token, response.results.city_name);
+
+    res.status(200).json(transformWeatherResponse(response));
+  }
+);
 
 // USUÁRIOS
 
