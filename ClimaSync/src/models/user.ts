@@ -1,13 +1,21 @@
 export interface UserInput {
   firebase_token: string;
 }
-export type AlertType =
-  | "alerta_calor"
-  | "alerta_frio"
-  | "alerta_sol"
-  | "alerta_chuva"
-  | "alerta_hidratacao";
 
+const _alerts = [
+  "alerta_calor",
+  "alerta_frio",
+  "alerta_sol",
+  "alerta_chuva",
+  "alerta_hidratacao",
+] as const;
+export type AlertType = (typeof _alerts)[number];
+
+export interface AlertUpdateInput {
+  token: string;
+  value: boolean;
+  type: AlertType;
+}
 export interface User extends UserInput {
   device_id: string;
   localizacao?: string;
@@ -25,7 +33,10 @@ export interface User extends UserInput {
 }
 
 export const validateUser = (user: UserInput) => {
-  if (!user.firebase_token) {
-    throw "Token do Firebase é obrigatório";
-  }
+  if (!user.firebase_token) throw "Token do Firebase é obrigatório";
+};
+
+export const validateAlert = (alert: AlertUpdateInput) => {
+  if (!_alerts.includes(alert.type))
+    throw `Tipo inválido de alerta ${alert.type}. Esperado: ${_alerts}`;
 };

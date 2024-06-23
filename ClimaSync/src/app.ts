@@ -81,3 +81,13 @@ app.post("/user", jsonParser, async (req: CustomRequest<UserInput>, res) => {
   const userFound = await findOrCreateUser(user);
   res.status(200).json(userFound);
 });
+
+app.put(
+  "/user/notification",
+  async (req: CustomRequest<AlertUpdateInput>, res) => {
+    const newAlert = req.body;
+    validateAlert(newAlert);
+    await updateUserAlert(newAlert);
+    res.status(200).json("Alerta atualizado com sucesso");
+  }
+);

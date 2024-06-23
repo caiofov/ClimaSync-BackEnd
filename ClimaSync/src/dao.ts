@@ -1,5 +1,5 @@
 import CONFIG from "./config";
-import { AlertType, User, UserInput } from "./models/user";
+import { AlertType, AlertUpdateInput, User, UserInput } from "./models/user";
 import { Pool } from "pg";
 
 // este arquivo contém as consultas no banco de dados
@@ -104,4 +104,16 @@ export const getUsersByPlaceAndAlert = async (
       [place]
     )
   ).rows as User[];
+};
+
+export const updateUserAlert = async (alert: AlertUpdateInput) => {
+  try {
+    await getPool().query(
+      "UPDATE public.user SET $1 = $2 WHERE firebase_token = $2",
+      [alert.type, alert.value, alert.token]
+    );
+  } catch (error) {
+    console.error(`Erro ao atualizar a notificação ${alert.type}:`, error);
+    throw error;
+  }
 };
