@@ -8,7 +8,7 @@ import {
 } from "./models/user";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
 import { logRequest } from "./utils";
-import { getWeather } from "./weather";
+import { getWeather, transformWeatherResponse } from "./weather";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Request } from "express";
@@ -68,7 +68,7 @@ app.put("/weather", async (req: CustomRequest<LocationInput>, res) => {
   const response = await getWeather(req.body.latitude, req.body.latitude);
   updateUserLocation(req.body.token, response.results.city_name);
 
-  res.status(200).json(response);
+  res.status(200).json(transformWeatherResponse(response));
 });
 
 // USUÁRIOS

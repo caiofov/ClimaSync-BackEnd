@@ -1,5 +1,5 @@
 import CONFIG from "./config";
-import { WeatherResponse } from "./models/weather";
+import { LocationOutput, WeatherResponse } from "./models/weather";
 
 // faz as requisições para a API de clima
 
@@ -29,3 +29,14 @@ export const getWeather = async (latitude: number, longitude: number) => {
     })
   );
 };
+
+export const transformWeatherResponse = async (info: WeatherResponse) =>
+  ({
+    temp: info.results.temp,
+    city: info.results.city,
+    city_name: info.results.city_name,
+    date: info.results.date,
+    time: info.results.time,
+    humidity: info.results.humidity,
+    condition: info.results.description,
+  } as LocationOutput);
