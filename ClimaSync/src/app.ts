@@ -69,7 +69,7 @@ app.put(
     logRequest(req);
     const body = req.body;
 
-    const response = await getWeather(body.latitude, body.latitude);
+    const response = await getWeather(body.latitude, body.longitude);
 
     updateUserLocation(body.token, response.results.city_name);
 
