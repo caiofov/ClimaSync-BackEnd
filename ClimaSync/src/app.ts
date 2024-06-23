@@ -94,6 +94,7 @@ app.post("/user", jsonParser, async (req: CustomRequest<UserInput>, res) => {
 
 app.put(
   "/user/notification",
+  jsonParser,
   async (req: CustomRequest<AlertUpdateInput>, res) => {
     const newAlert = req.body;
     validateAlert(newAlert);
