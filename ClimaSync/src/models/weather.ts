@@ -52,3 +52,13 @@ export interface LocationInput {
   longitude: number;
   token: string;
 }
+
+export interface LocationOutput {
+  temp: number;
+  date: string;
+  time: string;
+  humidity: number;
+  city: string;
+  city_name: string;
+  condition: string;
+}
