@@ -1,8 +1,21 @@
 import CONFIG from "./config";
+import { findOrCreateUser, updateUserAlert, updateUserLocation } from "./dao";
+import {
+  AlertUpdateInput,
+  UserInput,
+  validateAlert,
+  validateUser,
+} from "./models/user";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
 import { logRequest } from "./utils";
 import { getWeather } from "./weather";
 import * as express from "express";
+import * as bodyParser from "body-parser";
+import { Request } from "express";
+import { searchForAlerts } from "./alerts";
+import { LocationInput } from "./models/weather";
+
+type CustomRequest<T> = Request<{}, {}, T>;
 
 // Este arquivo deve conter todos as rotas da aplicação. É ele que é chamado quando esse projeto é rodado.
 
@@ -12,8 +25,13 @@ app.listen(CONFIG.PORT, () => {
   console.log(`Server is running on port ${CONFIG.PORT}`);
 });
 
-app.use(function (error, req, res, next) {
+// JSON parser
+const jsonParser = bodyParser.json();
+
+app.post("/cron-job", async (req, res) => {
   logRequest(req);
+  const result = await searchForAlerts();
+  res.status(200).json(result);
 });
 
 // TUYA
@@ -44,12 +62,36 @@ app.post("/tuya/:deviceId/switch/:value", async (req, res) => {
 
 // CLIMA
 
-app.get("/weather/:lat/:lon", async (req, res) => {
+app.put("/weather", async (req: CustomRequest<LocationInput>, res) => {
   logRequest(req);
 
-  const lat = Number(req.params.lat);
-  const lon = Number(req.params.lon);
+  const response = await getWeather(req.body.latitude, req.body.latitude);
+  updateUserLocation(req.body.token, response.results.city_name);
 
-  const response = await getWeather(lat, lon);
   res.status(200).json(response);
 });
+
+// USUÁRIOS
+
+app.post("/user", jsonParser, async (req: CustomRequest<UserInput>, res) => {
+  logRequest(req);
+  const user = req.body;
+
+  try {
+    validateUser(user);
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+  const userFound = await findOrCreateUser(user);
+  res.status(200).json(userFound);
+});
+
+app.put(
+  "/user/notification",
+  async (req: CustomRequest<AlertUpdateInput>, res) => {
+    const newAlert = req.body;
+    validateAlert(newAlert);
+    await updateUserAlert(newAlert);
+    res.status(200).json("Alerta atualizado com sucesso");
+  }
+);
