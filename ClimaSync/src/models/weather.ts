@@ -36,7 +36,7 @@ interface WeatherResults {
   city_name: string;
   timezone: string;
   forecast: WeatherForecast[];
-  cref: string;
+  cref?: string;
 }
 
 export interface WeatherResponse {
