@@ -71,7 +71,7 @@ app.put(
 
     const response = await getWeather(body.latitude, body.longitude);
 
-    updateUserLocation(body.token, response.results.city_name);
+    updateUserLocation(body.token, response.results.city);
 
     res.status(200).json(transformWeatherResponse(response));
   }
