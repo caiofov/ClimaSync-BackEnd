@@ -105,7 +105,22 @@ export const getUsersByPlaceAndAlert = async (
     )
   ).rows as User[];
 };
+export const updateUserLocation = async (
+  token: string,
+  locationName: string
+) => {
+  locationName = locationName.replace(/ /g, ""); // remover espaços do nome da cidade
 
+  try {
+    await getPool().query(
+      "UPDATE public.user SET localizacao = $1 WHERE firebase_token = $2",
+      [locationName, token]
+    );
+  } catch (error) {
+    console.error("Erro ao atualizar localização:", error);
+    throw error;
+  }
+};
 export const updateUserAlert = async (alert: AlertUpdateInput) => {
   try {
     await getPool().query(

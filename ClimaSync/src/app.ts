@@ -1,6 +1,11 @@
 import CONFIG from "./config";
-import { findOrCreateUser } from "./dao";
-import { UserInput, validateUser } from "./models/user";
+import { findOrCreateUser, updateUserAlert, updateUserLocation } from "./dao";
+import {
+  AlertUpdateInput,
+  UserInput,
+  validateAlert,
+  validateUser,
+} from "./models/user";
 import { getTuyaStatus, sendTuyaCommand } from "./tuya";
 import { logRequest } from "./utils";
 import { getWeather } from "./weather";
@@ -8,6 +13,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Request } from "express";
 import { searchForAlerts } from "./alerts";
+import { LocationInput } from "./models/weather";
 
 type CustomRequest<T> = Request<{}, {}, T>;
 
@@ -56,14 +62,12 @@ app.post("/tuya/:deviceId/switch/:value", async (req, res) => {
 
 // CLIMA
 
-app.get("/weather/:lat/:lon", async (req, res) => {
-  //TODO: receber token pra atualizar a localização se for diferente da que tá no banco
+app.put("/weather", async (req: CustomRequest<LocationInput>, res) => {
   logRequest(req);
 
-  const lat = Number(req.params.lat);
-  const lon = Number(req.params.lon);
+  const response = await getWeather(req.body.latitude, req.body.latitude);
+  updateUserLocation(req.body.token, response.results.city_name);
 
-  const response = await getWeather(lat, lon);
   res.status(200).json(response);
 });
 

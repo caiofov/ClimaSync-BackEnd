@@ -46,3 +46,9 @@ export interface WeatherResponse {
   execution_time: number;
   from_cache: boolean;
 }
+
+export interface LocationInput {
+  latitude: number;
+  longitude: number;
+  token: string;
+}
