@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS public."user"
     corpo_alerta character varying COLLATE pg_catalog."default",
     tipo_alerta character varying COLLATE pg_catalog."default",
     timestamp_alerta date,
-    alerta_calor boolean DEFAULT true,
     alerta_frio boolean DEFAULT true,
     alerta_sol boolean DEFAULT true,
     alerta_chuva boolean DEFAULT true,
