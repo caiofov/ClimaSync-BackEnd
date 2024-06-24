@@ -6,6 +6,12 @@ import { sendTuyaCommand } from "./tuya";
 import { getWeatherByName } from "./weather";
 
 // este arquivo contém as funções do cron job para coletar as informações de clima e notificar os usuários
+const admin = require('firebase-admin');
+const serviceAccount = require('.climasync-79c39-firebase-adminsdk-c2t60-5858a97c8d.json'); // Caminho para o arquivo de credenciais
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 const alertsForInfo = (info: WeatherResponse) => {
   // identifica quais alertas vão ser ativados com essas informações de clima
@@ -28,7 +34,24 @@ const alertsForInfo = (info: WeatherResponse) => {
 const alertUsers = (users: User[], alerts: AlertType[]) => {
   users.forEach((user) => {
     console.log(`Notificar usuário ${user.firebase_token}`);
-    //TODO: notificar o usuário aqui
+    const registrationToken = user.firebase_token;
+
+    const message = {
+      data: {
+        title: 'Título da Notificação',
+        body: 'Corpo da Notificação',
+      },
+      token: registrationToken,
+    };
+
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Notificação enviada com sucesso para:', user.firebase_token);
+      })
+      .catch((error) => {
+        console.error('Erro ao enviar notificação:', error);
+      });
+  });
     //TODO: tratar qual alerta é prioritário
   });
 };
