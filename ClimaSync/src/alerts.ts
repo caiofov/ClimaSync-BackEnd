@@ -26,6 +26,87 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+// Definir listas de mensagens para diferentes tipos de alertas
+const hydrationAlerts = [
+  {
+    title: 'Hora de se hidratar! 🥤',
+    body: 'O clima está seco. Beba água regularmente para se manter fresco e bem-hidratado.'
+  },
+  {
+    title: 'Hidrate-se! 🥤',
+    body: 'Beba água e evite atividades exaustivas ao ar livre.'
+  },
+  {
+    title: 'Clima quente e seco! 🌞🥤',
+    body: 'Lembre-se de se hidratar regularmente. Beba água e proteja-se do sol.'
+  }
+];
+
+const sunAlerts = [
+  {
+    title: 'Alerta! ☀️🧴',
+    body: 'Hoje está ensolarado e a intensidade solar está alta. Lembre-se de usar protetor solar!'
+  },
+  {
+    title: 'Dica: 🌞🕶️🧴',
+    body: 'Chapéu, óculos de sol e protetor solar são seus melhores amigos hoje!'
+  },
+  {
+    title: 'Reaplique o protetor solar! ☀️🔄🧴',
+    body: 'Lembre-se de reaplicar o protetor solar se estiver ao ar livre por muito tempo!'
+  },
+  {
+    title: 'Clima quente e ensolarado! ☀️🧴',
+    body: 'Lembre-se de usar protetor solar e proteger-se do sol.'
+  }
+];
+
+const rainAlerts = [
+  {
+    title: 'Cuidado nas estradas molhadas! 🚗🌧️',
+    body: 'Dirija com segurança na chuva.'
+  },
+  {
+    title: 'Tempo chuvoso! 🌧️🧥',
+    body: 'Mantenha-se seco e protegido.'
+  },
+  {
+    title: 'Previsão de chuva forte! ☔🌂',
+    body: 'Não esqueça de uma boa capa de chuva.'
+  },
+  {
+    title: 'Prepare-se para a chuva! 🌧️',
+    body: 'Não esqueça o guarda-chuva e vista roupas impermeáveis.'
+  },
+  {
+    title: 'Não saia sem guarda-chuva! ☔',
+    body: 'A chuva está chegando.'
+  },
+  {
+    title: 'Clima chuvoso! 🌦️',
+    body: 'Use seu guarda-chuva e vista roupas adequadas para enfrentar o dia.'
+  }
+];
+
+const coldAlerts = [
+  {
+    title: 'Prepare-se para o frio! ❄️🧥🧣',
+    body: 'Camadas de roupas e um casaco quente são essenciais.'
+  },
+  {
+    title: 'Cachecol e luvas! 🧣❄️',
+    body: 'Não esqueça do cachecol e das luvas! O frio está intenso lá fora.'
+  },
+  {
+    title: 'Hora de um chá quentinho! ☕❄️',
+    body: 'Mantenha-se aquecido neste clima gelado.'
+  },
+  {
+    title: 'Bota uma bota! 🤪❄️',
+    body: 'Proteja seus pés do frio.'
+  }
+];
+
 const alertsForInfo = (info: WeatherResponse) => {
   // identifica quais alertas vão ser ativados com essas informações de clima
   const alerts: AlertType[] = [];
@@ -44,24 +125,56 @@ const alertsForInfo = (info: WeatherResponse) => {
   return alerts;
 };
 
-const alertUsers = (users: User[], alerts: AlertType[]) => {
-  users.forEach((user) => {
-    const registrationToken = user.firebase_token;
-    const message = {
-      data: {
-        title: 'Título da Notificação',
-        body: 'Corpo da Notificação',
-      },
-      token: registrationToken,
-    };
+// Função para obter a lista de mensagens com base no tipo de alerta
+const getAlertsList = (alertType) => {
+  switch (alertType) {
+    case 'alerta_hidratacao':
+      return hydrationAlerts;
+    case 'alerta_sol':
+      return sunAlerts;
+    case 'alerta_chuva':
+      return rainAlerts;
+    case 'alerta_frio':
+      return coldAlerts;
+    default:
+      console.error('Tipo de alerta desconhecido:', alertType);
+      return [];
+  }
+};
 
-    admin.messaging().send(message)
-      .then((response) => {
-        console.log('Notificação enviada com sucesso para:', user.firebase_token);
-      })
-      .catch((error) => {
-        console.error('Erro ao enviar notificação:', error);
+// Função para escolher uma mensagem aleatória de uma lista
+const getRandomMessage = (alerts) => {
+  const randomIndex = Math.floor(Math.random() * alerts.length);
+  return alerts[randomIndex];
+};
+
+//Enviar alertas e salvar o mais recente
+const alertUsers = (users: User[], alertsTypes: AlertType[]) => {
+  alertsTypes.forEach(alertType => {
+    const alertMessages = getAlertsList(alertType);
+    if (alertMessages.length > 0) {
+      users.forEach((user) => {
+        const registrationToken = user.firebase_token;
+        const { title, body } = getRandomMessage(alertMessages);
+        const message = {
+          notification: {
+            title: title,
+            body: body,
+          },
+          token: registrationToken,
+        };
+
+        //TODO: SALVAR NO BANCO TITLE, BODY, TYPE E DATA ULTIMA NOTIFICACAO
+
+        admin.messaging().send(message)
+          .then((response) => {
+            console.log('Notificação enviada com sucesso para:', user.firebase_token);
+          })
+          .catch((error) => {
+            console.error('Erro ao enviar notificação:', error);
+          });
       });
+    }
   });
 };
 
