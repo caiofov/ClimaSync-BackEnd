@@ -33,9 +33,7 @@ const alertsForInfo = (info: WeatherResponse) => {
 
 const alertUsers = (users: User[], alerts: AlertType[]) => {
   users.forEach((user) => {
-    console.log(`Notificar usuário ${user.firebase_token}`);
     const registrationToken = user.firebase_token;
-
     const message = {
       data: {
         title: 'Título da Notificação',
@@ -51,8 +49,6 @@ const alertUsers = (users: User[], alerts: AlertType[]) => {
       .catch((error) => {
         console.error('Erro ao enviar notificação:', error);
       });
-  });
-    //TODO: tratar qual alerta é prioritário
   });
 };
 
