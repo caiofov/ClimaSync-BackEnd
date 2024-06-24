@@ -96,8 +96,10 @@ app.put(
   "/user/notification",
   jsonParser,
   async (req: CustomRequest<AlertUpdateInput>, res) => {
+    logRequest(req);
     const newAlert = req.body;
     validateAlert(newAlert);
+
     await updateUserAlert(newAlert);
     res.status(200).json("Alerta atualizado com sucesso");
   }

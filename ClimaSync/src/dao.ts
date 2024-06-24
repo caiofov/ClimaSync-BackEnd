@@ -124,8 +124,8 @@ export const updateUserLocation = async (
 export const updateUserAlert = async (alert: AlertUpdateInput) => {
   try {
     await getPool().query(
-      "UPDATE public.user SET $1 = $2 WHERE firebase_token = $2",
-      [alert.type, alert.value, alert.token]
+      `UPDATE public.user SET ${alert.type}=CAST($1 as BOOLEAN) WHERE firebase_token=$2`,
+      [alert.value, alert.token]
     );
   } catch (error) {
     console.error(`Erro ao atualizar a notificação ${alert.type}:`, error);
