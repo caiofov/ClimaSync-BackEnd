@@ -1,5 +1,5 @@
 import CONFIG from "./config";
-import { getAllPlaces, listUsersByPlace } from "./dao";
+import { getAllPlaces, listUsersByPlace, updateLastMessage} from "./dao";
 import { TEMP_ALERT, WEATHER_ALERT } from "./enums/weather";
 import { AlertType, User } from "./models/user";
 import { WeatherResponse } from "./models/weather";
@@ -37,7 +37,7 @@ const hydrationAlerts = [
     body: 'Beba água e evite atividades exaustivas ao ar livre.'
   },
   {
-    title: 'Clima quente e seco! 🌞🥤',
+    title: 'Clima seco! 🌞🥤',
     body: 'Lembre-se de se hidratar regularmente. Beba água e proteja-se do sol.'
   }
 ];
@@ -102,7 +102,7 @@ const coldAlerts = [
     body: 'Mantenha-se aquecido neste clima gelado.'
   },
   {
-    title: 'Bota uma bota! 🤪❄️',
+    title: 'Bota uma bota! 🥾🤪❄️',
     body: 'Proteja seus pés do frio.'
   }
 ];
@@ -117,6 +117,8 @@ const alertsForInfo = (info: WeatherResponse) => {
   if (info.results.humidity <= TEMP_ALERT.HUMIDITY)
     alerts.push("alerta_hidratacao");
 
+  console.log(info.results.condition_code);
+  
   if (WEATHER_ALERT.RAINY.includes(info.results.condition_code))
     alerts.push("alerta_chuva");
   else if (WEATHER_ALERT.SUNNY.includes(info.results.condition_code))
@@ -148,12 +150,36 @@ const getRandomMessage = (alerts) => {
   return alerts[randomIndex];
 };
 
+//Verificar se usuário possui alerta ativado
+const isAlertActivatedForUser = (user, alertType) => {
+  switch (alertType) {
+    case 'alerta_hidratacao':
+      return user.alerta_hidratacao;
+    case 'alerta_sol':
+      return user.alerta_sol;
+    case 'alerta_chuva':
+      return user.alerta_chuva;
+    case 'alerta_frio':
+      return user.alerta_frio;
+    default:
+      return false;
+  }
+};
+
 //Enviar alertas e salvar o mais recente
-const alertUsers = (users: User[], alertsTypes: AlertType[]) => {
-  alertsTypes.forEach(alertType => {
-    const alertMessages = getAlertsList(alertType);
-    if (alertMessages.length > 0) {
-      users.forEach((user) => {
+const alertUsers = (users, alertsTypes) => {
+  // Visitando cada usuário
+  users.forEach((user) => {
+    // Verifica se algum alerta já foi enviado para este usuário
+    let notificationSent = false;
+
+    // Visitando alertas gatilhados para este usuário
+    alertsTypes.forEach(alertType => {
+      // Se já enviou notificação para este usuário, sair do loop
+      if (notificationSent) return;
+
+      const alertMessages = getAlertsList(alertType);
+      if (alertMessages.length > 0 && isAlertActivatedForUser(user, alertType)) {
         const registrationToken = user.firebase_token;
         const { title, body } = getRandomMessage(alertMessages);
         const message = {
@@ -164,8 +190,6 @@ const alertUsers = (users: User[], alertsTypes: AlertType[]) => {
           token: registrationToken,
         };
 
-        //TODO: SALVAR NO BANCO TITLE, BODY, TYPE E DATA ULTIMA NOTIFICACAO
-
         admin.messaging().send(message)
           .then((response) => {
             console.log('Notificação enviada com sucesso para:', user.firebase_token);
@@ -173,8 +197,14 @@ const alertUsers = (users: User[], alertsTypes: AlertType[]) => {
           .catch((error) => {
             console.error('Erro ao enviar notificação:', error);
           });
-      });
-    }
+
+        // Atualiza o último alerta enviado para o usuário
+        updateLastMessage(title, body, alertType, registrationToken);
+
+        // Marca que uma notificação foi enviada para este usuário
+        notificationSent = true;
+      }
+    });
   });
 };
 
