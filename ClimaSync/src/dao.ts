@@ -1,5 +1,5 @@
 import CONFIG from "./config";
-import { AlertType, User, UserInput } from "./models/user";
+import { AlertType, AlertUpdateInput, User, UserInput } from "./models/user";
 import { Pool } from "pg";
 
 // este arquivo contém as consultas no banco de dados
@@ -106,7 +106,12 @@ export const getUsersByPlaceAndAlert = async (
   ).rows as User[];
 };
 
-export const updateLastMessage = async (title: string, body: string, type: string, token: string) => {
+export const updateLastMessage = async (
+  title: string,
+  body: string,
+  type: string,
+  token: string
+) => {
   try {
     await getPool().query(
       "UPDATE public.user SET titulo_alerta = $1, corpo_alerta = $2, tipo_alerta = $3, timestamp_alerta = NOW() WHERE firebase_token = $4",
@@ -114,6 +119,34 @@ export const updateLastMessage = async (title: string, body: string, type: strin
     );
   } catch (error) {
     console.error(`Erro ao atualizar a notificação ${type}:`, error);
+    throw error;
+  }
+};
+
+export const updateUserLocation = async (
+  token: string,
+  locationName: string
+) => {
+  locationName = locationName.replace(/ /g, ""); // remover espaços do nome da cidade
+
+  try {
+    await getPool().query(
+      "UPDATE public.user SET localizacao = $1 WHERE firebase_token = $2",
+      [locationName, token]
+    );
+  } catch (error) {
+    console.error("Erro ao atualizar localização:", error);
+    throw error;
+  }
+};
+export const updateUserAlert = async (alert: AlertUpdateInput) => {
+  try {
+    await getPool().query(
+      `UPDATE public.user SET ${alert.type}=CAST($1 as BOOLEAN) WHERE firebase_token=$2`,
+      [alert.value, alert.token]
+    );
+  } catch (error) {
+    console.error(`Erro ao atualizar a notificação ${alert.type}:`, error);
     throw error;
   }
 };
