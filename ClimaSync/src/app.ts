@@ -14,6 +14,7 @@ import * as bodyParser from "body-parser";
 import { Request } from "express";
 import { searchForAlerts } from "./alerts";
 import { LocationInput } from "./models/weather";
+import { AlertThresholds } from "./enums/weather";
 
 type CustomRequest<T> = Request<{}, {}, T>;
 
@@ -28,11 +29,15 @@ app.listen(CONFIG.PORT, () => {
 // JSON parser
 const jsonParser = bodyParser.json();
 
-app.post("/cron-job", async (req, res) => {
-  logRequest(req);
-  const result = await searchForAlerts();
-  res.status(200).json(result);
-});
+app.post(
+  "/cron-job",
+  jsonParser,
+  async (req: CustomRequest<AlertThresholds>, res) => {
+    logRequest(req);
+    const result = await searchForAlerts(req.body);
+    res.status(200).json(result);
+  }
+);
 
 // TUYA
 

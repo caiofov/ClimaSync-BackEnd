@@ -71,11 +71,11 @@ export type ConditionCodeType =
 export type ConditionSlugType =
   (typeof CONDITION_SLUG)[keyof typeof CONDITION_SLUG];
 
-export const TEMP_ALERT = {
-  HOT: 30,
-  COLD: 15,
-  HUMIDITY: 20,
-} as const;
+export interface AlertThresholds {
+  hot: number;
+  cold: number;
+  humidity: number;
+}
 
 export const WEATHER_ALERT = {
   RAINY: [
@@ -91,4 +91,12 @@ export const WEATHER_ALERT = {
     CONDITION_CODE.MOSTLY_SUNNY,
     CONDITION_CODE.MOSTLY_SUNNY_WITH_SOME_CLOUDS,
   ] as number[],
+};
+
+export const validateThreshold = (thresholds: any) => {
+  return {
+    hot: thresholds.hot ?? 30,
+    cold: thresholds.cold ?? 22,
+    humidity: thresholds.humidity ?? 60,
+  } as AlertThresholds;
 };
