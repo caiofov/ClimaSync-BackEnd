@@ -173,6 +173,9 @@ const alertUsers = (users, alertsTypes) => {
     // Verifica se algum alerta já foi enviado para este usuário
     let notificationSent = false;
 
+    const registrationToken = user.firebase_token;
+    if (registrationToken == "pushToken") return;
+
     // Visitando alertas gatilhados para este usuário
     alertsTypes.forEach((alertType) => {
       // Se já enviou notificação para este usuário, sair do loop
@@ -183,7 +186,6 @@ const alertUsers = (users, alertsTypes) => {
         alertMessages.length > 0 &&
         isAlertActivatedForUser(user, alertType)
       ) {
-        const registrationToken = user.firebase_token;
         const { title, body } = getRandomMessage(alertMessages);
         const message = {
           notification: {
